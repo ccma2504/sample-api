@@ -1,0 +1,34 @@
+version: '3'
+services:
+  mysql-master:
+    image: mysql:5.7.18
+    volumes:
+      - ./mysql_db/master:/mysql
+      - ./investment:/investment
+      - ./seeding.sh:/docker-entrypoint-initdb.d/seeding.sh
+      - ./db/conf/master:/etc/mysql/conf.d
+    environment:
+      - TZ=Asia/Seoul
+      - MYSQL_ROOT_PASSWORD=root_pw
+      - MYSQL_DATABASE=investment
+      - MYSQL_USER=user_investment
+      - MYSQL_PASSWORD=user_investment_pw
+    ports:
+      - "13306:3306"
+  mysql-slave:
+    image: mysql:5.7.18
+    volumes:
+      - ./mysql_db/slave:/mysql
+      - ./investment:/investment
+      - ./seeding.sh:/docker-entrypoint-initdb.d/seeding.sh
+      - ./db/conf/slave:/etc/mysql/conf.d
+    depends_on:
+      - mysql-master
+    environment:
+      - TZ=Asia/Seoul
+      - MYSQL_ROOT_PASSWORD=root_pw
+      - MYSQL_DATABASE=investment
+      - MYSQL_USER=user_investment
+      - MYSQL_PASSWORD=user_investment_pw
+    ports:
+      - "23306:3306"
